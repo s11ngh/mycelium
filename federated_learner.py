@@ -50,7 +50,6 @@ def local_trainer(dataframe, n_clusters=3):
 @app.function(image=image)
 def aggregate_cluster_centers(centers_list):
     try:
-        # Compute average cluster centers
         avg_centers = np.mean(np.array(centers_list), axis=0)
         return avg_centers
     except Exception as e:
@@ -60,7 +59,7 @@ def aggregate_cluster_centers(centers_list):
 # update global model with averaged cluster centers
 @app.function(image=image)
 def update_global_model(avg_centers):
-    np.save('global_cluster_centers.npy', avg_centers)
+    np.save('global_model.npy', avg_centers)
 
 @app.function(image=image)
 def read_and_split_csv_file():
