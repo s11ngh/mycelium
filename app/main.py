@@ -50,15 +50,27 @@ def read_and_split_csv_file():
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"CSV file not found at {csv_path}")
     print(f"CSV file found at {csv_path}")
-    df1, df2 = read_and_split_csv()
+    
+    # Read and split the DataFrame into three parts
+    df = pd.read_csv(csv_path)
+    split1 = len(df) // 3
+    split2 = 2 * len(df) // 3
+    df1 = df.iloc[:split1]
+    df2 = df.iloc[split1:split2]
+    df3 = df.iloc[split2:]
+
     # Train each dataframe locally
     centers1, labels1 = local_trainer.call(df1)
     centers2, labels2 = local_trainer.call(df2)
+    centers3, labels3 = local_trainer.call(df3)
+    
     # Aggregate result
-    avg_centers = aggregate_cluster_centers_func.call([centers1, centers2])
+    avg_centers = aggregate_cluster_centers_func.call([centers1, centers2, centers3])
+    
     # Update global model
     update_global_model_func.call(avg_centers)
-    return df1, df2
+    
+    return df1, df2, df3
 
 @app.function(image=image, volumes={"/mount/data": data_volume})
 def upload_data():
@@ -79,5 +91,5 @@ def upload_data():
 # Optional: Local entry point for testing
 @app.local_entrypoint()
 def main():
-    df1, df2 = read_and_split_csv_file.call()
+    df1, df2, df3 = read_and_split_csv_file.call()
     print("DataFrames processed and global model updated.")
