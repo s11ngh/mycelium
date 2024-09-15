@@ -131,6 +131,7 @@ starlette==0.38.5
 sympy==1.12
 synchronicity==0.7.6
 tenacity==9.0.0
+tensorflow==2.17.0
 terminado==0.18.1
 threadpoolctl==3.5.0
 tinycss2==1.3.0
