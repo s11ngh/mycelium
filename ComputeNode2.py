@@ -5,7 +5,7 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-app = modal.App("Compute_Node_1")
+app = modal.App("Compute_Node_2")
 
 vol = modal.Volume.from_name("data_volume")
 

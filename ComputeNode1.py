@@ -7,10 +7,13 @@ from sklearn.preprocessing import StandardScaler
 
 app = modal.App("Compute_Node_1")
 
+# Allows me to read from data_volume for my partitioned dataset 
 vol = modal.Volume.from_name("data_volume")
 
+# Setting up imports for later functions 
 image = modal.Image.debian_slim().pip_install("pandas", "tensorflow", "numpy", "scikit-learn")
 
+# Reads, Trains with, and Saves data 
 @app.function(volumes={"/data": vol}, image=image, gpu="H100")
 def compute():
    
@@ -18,11 +21,13 @@ def compute():
 
     df = pd.read_csv(csv_file_path)
 
+# Cleaning / Labeling Data for Model
     X = df[['Age', 'Income', 'Transaction_amount', 'Number_of_accounts', 'Suspicion_score']]  
     y = df['Is_high_risk']  
 
     X_train, y_train = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# Mean - 0 Standard Div. - 1
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
 
@@ -68,10 +73,9 @@ def compute():
 
     train(model, X_train_tf, y_train_tf, epochs=1000, lambda_l2=0.01)
 
+# Save in data_volume for Decentralized Model
     np.save("/data/weights.npy", model.W.numpy()) 
     np.save("/data/biases.npy", model.b.numpy())   
-
-    print("Model weights and biases saved to /data")
 
 @app.local_entrypoint()
 def main():
