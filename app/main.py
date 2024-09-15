@@ -46,7 +46,7 @@ def update_global_model_func(avg_centers):
 
 @app.function(image=image, volumes={"/mount/data": data_volume})
 def read_and_split_csv_file():
-    csv_path = '/mount/data/Mall_Customers.csv'
+    csv_path = '/mount/data/synthetic_financial_privacy_dataset.csv'
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"CSV file not found at {csv_path}")
     print(f"CSV file found at {csv_path}")
@@ -60,9 +60,9 @@ def read_and_split_csv_file():
     df3 = df.iloc[split2:]
 
     # Save each partition as a separate CSV file
-    df1_path = '/mount/data/Mall_Customers_part1.csv'
-    df2_path = '/mount/data/Mall_Customers_part2.csv'
-    df3_path = '/mount/data/Mall_Customers_part3.csv'
+    df1_path = '/mount/data/Anomaly_part1.csv'
+    df2_path = '/mount/data/Anomaly_part2.csv'
+    df3_path = '/mount/data/Anomaly_part3.csv'
 
     df1.to_csv(df1_path, index=False)
     df2.to_csv(df2_path, index=False)
@@ -76,8 +76,8 @@ def read_and_split_csv_file():
 def upload_data():
     import requests
 
-    remote_csv_path = "/mount/data/Mall_Customers.csv"
-    csv_url = "https://raw.githubusercontent.com/s11ngh/mycelium/main/Mall_Customers.csv"  # Updated URL
+    remote_csv_path = "/mount/data/synthetic_financial_privacy_dataset.csv"
+    csv_url = "https://raw.githubusercontent.com/s11ngh/mycelium/main/synthetic_financial_privacy_dataset.csv"  # Updated URL
 
     response = requests.get(csv_url)
     if response.status_code != 200:
