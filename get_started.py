@@ -3,13 +3,7 @@ import modal
 # Define the image with system-level and Python dependencies
 image = (
     modal.Image.debian_slim(python_version="3.10")
-    .apt_install("git")  # Install Git
-    .pip_install("torch==2.2.1", "pandas==2.2.0", "numpy", "flask")  # Install Python dependencies
-    .run_commands(
-        # Clone the mycelium-hackmit repository
-        "git clone https://github.com/s11ngh/mycelium.git",
-        
-    )
+    .pip_install("flask")  # Install Python dependencies
 )
 
 # Define the Modal app
