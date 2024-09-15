@@ -9,8 +9,8 @@ from sklearn.pipeline import Pipeline
 import os
 
 # Define paths
-CSV_FILE_PATH = '/mount/data/Mall_Customers.csv'
-GLOBAL_MODEL_PATH = '/mount/data/global_model.npy'
+CSV_FILE_PATH = '/mount/data/synthetic_financial_privacy_dataset.csv'
+GLOBAL_MODEL_PATH = '/mount/data/synthetic_financial_privacy_dataset.csv'
 
 def preprocess_data(df):
     categorical_cols = ['Genre']
