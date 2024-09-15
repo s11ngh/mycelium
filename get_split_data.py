@@ -35,8 +35,8 @@ def read_and_split_csv_file():
 @app.local_entrypoint()
 def main():
     # Call the function directly and print the result
-    df1_head, df2_head = read_and_split_csv_file.local()
-    print("DataFrame 1 Head:")
-    print(df1_head)
-    print("\nDataFrame 2 Head:")
-    print(df2_head)
+    df1, df2 = read_and_split_csv_file.local()
+    print("DataFrame 1:")
+    print(df1)
+    print("\nDataFrame 2:")
+    print(df2)
