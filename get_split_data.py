@@ -10,22 +10,33 @@ image = (
 # Define the Modal app
 app = modal.App("csv-reader")
 
-# Define a Modal function to read a CSV file using pandas
+# Define a Modal function to read a CSV file and split it
 @app.function(image=image)
-def read_csv_file():
+def read_and_split_csv_file():
     # Path to the CSV file (adjust as needed)
     csv_file_path = 'customers.csv'  # Update this path
     
     # Read the CSV file using pandas
     df = pd.read_csv(csv_file_path)
     
-    # Print the dataframe (or return it if you want to see the content)
-    print(df)
-    return df.head()  # Return the first few rows of the dataframe
+    # Split the dataframe into two equal partitions
+    df1 = df.iloc[:len(df)//2]
+    df2 = df.iloc[len(df)//2:]
+    
+    # Print or return the dataframes
+    print("DataFrame 1:")
+    print(df1)
+    print("\nDataFrame 2:")
+    print(df2)
+    
+    return df1, df2
 
 # Define the entrypoint for local execution
 @app.local_entrypoint()
 def main():
     # Call the function directly and print the result
-    result = read_csv_file.local()
-    print(result)
+    df1_head, df2_head = read_and_split_csv_file.local()
+    print("DataFrame 1 Head:")
+    print(df1_head)
+    print("\nDataFrame 2 Head:")
+    print(df2_head)
