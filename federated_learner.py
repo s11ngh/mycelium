@@ -6,30 +6,23 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
-# Define the image with system-level and Python dependencies (include pandas and scikit-learn)
 image = (
     modal.Image.debian_slim(python_version="3.10")
     .pip_install("pandas", "scikit-learn")
 )
 
-# Define the Modal app
 app = modal.App("ml-training", image=image)
 
-# Preprocessing function
 def preprocess_data(df):
-    # Define categorical and numerical columns
     categorical_cols = ['Genre']
     numerical_cols = ['Age', 'Annual Income (k$)', 'Spending Score (1-100)']
 
-    # Preprocessing for numerical data: Scaling
     numerical_transformer = Pipeline(steps=[
         ('scaler', StandardScaler())])
 
-    # Preprocessing for categorical data: One-Hot Encoding
     categorical_transformer = Pipeline(steps=[
         ('onehot', OneHotEncoder(handle_unknown='ignore'))])
 
-    # Combine transformers into a preprocessor
     preprocessor = ColumnTransformer(
         transformers=[
             ('num', numerical_transformer, numerical_cols),
@@ -38,9 +31,9 @@ def preprocess_data(df):
     X = preprocessor.fit_transform(df)
     return X
 
-# Define Modal functions for model training
+# Modal functions for local model training
 @app.function(image=image)
-def train_kmeans_on_data(dataframe, n_clusters=3):
+def local_trainer(dataframe, n_clusters=3):
     X = preprocess_data(dataframe)
 
     # Train a KMeans model
@@ -53,7 +46,7 @@ def train_kmeans_on_data(dataframe, n_clusters=3):
 
     return cluster_centers, labels
 
-# Define a function to aggregate cluster centers
+# aggregate cluster centers
 @app.function(image=image)
 def aggregate_cluster_centers(centers_list):
     try:
@@ -64,10 +57,9 @@ def aggregate_cluster_centers(centers_list):
         print(f"Error while aggregating: {e}")
         raise
 
-# Define a function to update the global model with averaged cluster centers
+# update global model with averaged cluster centers
 @app.function(image=image)
 def update_global_model(avg_centers):
-    # Save the averaged cluster centers to a file
     np.save('global_cluster_centers.npy', avg_centers)
 
 @app.function(image=image)
@@ -78,14 +70,14 @@ def read_and_split_csv_file():
     df1 = df.iloc[:len(df)//2]
     df2 = df.iloc[len(df)//2:]
 
-    # Train KMeans models on each dataframe and get their cluster centers
-    centers1, labels1 = train_kmeans_on_data.local(df1)
-    centers2, labels2 = train_kmeans_on_data.local(df2)
+    # train each dataframe locally
+    centers1, labels1 = local_trainer.local(df1)
+    centers2, labels2 = local_trainer.local(df2)
 
-    # Aggregate cluster centers
+    # aggregate result
     avg_centers = aggregate_cluster_centers.local([centers1, centers2])
 
-    # Update global model with averaged cluster centers
+    # update global model
     update_global_model.local(avg_centers)
 
     return df1, df2
