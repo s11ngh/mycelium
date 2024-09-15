@@ -3,7 +3,6 @@
 import modal
 from modal import Volume  # Import Volume directly
 from app.utils import (
-    read_and_split_csv,
     preprocess_data,
     train_kmeans,
     aggregate_cluster_centers,
@@ -12,6 +11,7 @@ from app.utils import (
 )
 import numpy as np
 import os
+import pandas as pd
 
 # Define the Modal image with required dependencies
 image = (
@@ -59,18 +59,18 @@ def read_and_split_csv_file():
     df2 = df.iloc[split1:split2]
     df3 = df.iloc[split2:]
 
-    # Train each dataframe locally
-    centers1, labels1 = local_trainer.call(df1)
-    centers2, labels2 = local_trainer.call(df2)
-    centers3, labels3 = local_trainer.call(df3)
-    
-    # Aggregate result
-    avg_centers = aggregate_cluster_centers_func.call([centers1, centers2, centers3])
-    
-    # Update global model
-    update_global_model_func.call(avg_centers)
-    
-    return df1, df2, df3
+    # Save each partition as a separate CSV file
+    df1_path = '/mount/data/Mall_Customers_part1.csv'
+    df2_path = '/mount/data/Mall_Customers_part2.csv'
+    df3_path = '/mount/data/Mall_Customers_part3.csv'
+
+    df1.to_csv(df1_path, index=False)
+    df2.to_csv(df2_path, index=False)
+    df3.to_csv(df3_path, index=False)
+
+    print(f"Data has been split and saved as: {df1_path}, {df2_path}, {df3_path}")
+
+    return df1_path, df2_path, df3_path
 
 @app.function(image=image, volumes={"/mount/data": data_volume})
 def upload_data():
@@ -86,10 +86,16 @@ def upload_data():
     with open(remote_csv_path, "w") as f:
         f.write(response.text)
     
-    return "Data uploaded successfully."
+    print("Data uploaded successfully. Splitting and saving into 3 parts...")
+    # After uploading, split the data into three parts
+    read_and_split_csv_file.remote()  # Use .remote() to call the function remotely
 
+
+# Optional: Local entry point for testing
 # Optional: Local entry point for testing
 @app.local_entrypoint()
 def main():
-    df1, df2, df3 = read_and_split_csv_file.call()
-    print("DataFrames processed and global model updated.")
+    # Use `upload_data.remote()` to invoke the function on Modal
+    upload_data.remote()
+    print("Data uploaded, split, and saved to Modal volume.")
+
