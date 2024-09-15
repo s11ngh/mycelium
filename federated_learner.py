@@ -65,21 +65,29 @@ def update_global_model(avg_centers):
 def read_and_split_csv_file():
     csv_file_path = 'Mall_Customers.csv'
     df = pd.read_csv(csv_file_path)
+    
+    # Calculate indices to split the DataFrame into three parts
+    split1 = len(df) // 3
+    split2 = 2 * len(df) // 3
+    
+    # Split the DataFrame into three parts
+    df1 = df.iloc[:split1]
+    df2 = df.iloc[split1:split2]
+    df3 = df.iloc[split2:]
 
-    df1 = df.iloc[:len(df)//2]
-    df2 = df.iloc[len(df)//2:]
-
-    # train each dataframe locally
+    # Train each dataframe locally
     centers1, labels1 = local_trainer.local(df1)
     centers2, labels2 = local_trainer.local(df2)
+    centers3, labels3 = local_trainer.local(df3)
 
-    # aggregate result
-    avg_centers = aggregate_cluster_centers.local([centers1, centers2])
+    # Aggregate results
+    avg_centers = aggregate_cluster_centers.local([centers1, centers2, centers3])
 
-    # update global model
+    # Update global model
     update_global_model.local(avg_centers)
 
-    return df1, df2
+    return df1, df2, df3
+
 
 @app.local_entrypoint()
 def main():
