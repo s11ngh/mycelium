@@ -1,28 +1,31 @@
 import modal
+import pandas as pd
 
-# Define the image with system-level and Python dependencies
+# Define the image with system-level and Python dependencies (include pandas)
 image = (
     modal.Image.debian_slim(python_version="3.10")
-    .pip_install("flask")  # Install Python dependencies
+    .pip_install("pandas")  # Install pandas
 )
 
 # Define the Modal app
-app = modal.App("pysyft-server-mycelium")
+app = modal.App("csv-reader")
 
-# Define a Modal function using the custom image
+# Define a Modal function to read a CSV file using pandas
 @app.function(image=image)
-def run_syft_server():
-    import os
-    import subprocess
+def read_csv_file():
+    # Path to the CSV file (adjust as needed)
+    csv_file_path = 'customers.csv'  # Update this path
     
-    # Set the FLASK_APP environment variable if needed
-    os.environ["FLASK_APP"] = "app.py"  # or whichever file contains your Flask app
+    # Read the CSV file using pandas
+    df = pd.read_csv(csv_file_path)
     
-    # Start the PyGrid server (assuming Flask app is in `app.py`)
-    subprocess.run(["flask", "run", "--host=0.0.0.0", "--port=5000"])
+    # Print the dataframe (or return it if you want to see the content)
+    print(df)
+    return df.head()  # Return the first few rows of the dataframe
 
 # Define the entrypoint for local execution
 @app.local_entrypoint()
 def main():
-    # Run the function directly (no .call())
-    run_syft_server.local() # Just call the function directly
+    # Call the function directly and print the result
+    result = read_csv_file.local()
+    print(result)
