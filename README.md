@@ -46,6 +46,3 @@ Feel free to contact us for any questions or recruitment opportunities
 [Ujjwal's Linkedin]: <https://www.linkedin.com/in/ujjwalsinghh/>
    [Jon's Linkedin]: <https://www.linkedin.com/in/jkozlik/>
    [Sriya's Linkedin]: <https://www.linkedin.com/in/sriya-chinthalapudi/>
-
-
-**If you're a recruiter, feel free to click our profiles and click on our Linkedin links**
