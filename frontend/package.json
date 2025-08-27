@@ -12,9 +12,12 @@
   "dependencies": {
     "@headlessui/react": "^2.1.8",
     "@heroicons/react": "^2.1.5",
+    "fabric": "^6.7.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "tailwindcss": "^3.4.11"
+    "react-hotkeys-hook": "^5.1.0",
+    "tailwindcss": "^3.4.11",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
